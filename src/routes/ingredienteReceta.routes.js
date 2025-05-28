@@ -1,6 +1,6 @@
 // src/routes/ingredienteReceta.routes.js
 import { Router } from 'express';
-import { IngredienteReceta, Ingrediente, Receta } from '../models/index.js'; // Asegúrate de importar Ingrediente y Receta
+import { IngredienteReceta, Ingrediente, Receta } from '../models/index.js'; 
 
 const router = Router();
 
@@ -9,8 +9,8 @@ router.get('/', async (req, res) => {
     try {
         const ingredientesReceta = await IngredienteReceta.findAll({
             include: [
-                { model: Ingrediente, attributes: ['nombre'] }, // Incluye el nombre del ingrediente
-                { model: Receta, attributes: ['nombreReceta'] }  // Incluye el nombre de la receta
+                { model: Ingrediente, attributes: ['nombre'] }, 
+                { model: Receta, attributes: ['nombreReceta'] }  
             ]
         });
         res.json(ingredientesReceta);
@@ -46,7 +46,7 @@ router.get('/receta/:id_receta', async (req, res) => {
     try {
         const ingredientesEnReceta = await IngredienteReceta.findAll({
             where: { id_receta },
-            include: [{ model: Ingrediente, attributes: ['nombre'] }] // Solo el nombre del ingrediente
+            include: [{ model: Ingrediente, attributes: ['nombre'] }]
         });
         if (ingredientesEnReceta.length === 0) {
             return res.status(404).json({ message: 'No se encontraron ingredientes para esta receta.' });
@@ -64,7 +64,7 @@ router.get('/ingrediente/:id_ingrediente', async (req, res) => {
     try {
         const recetasConIngrediente = await IngredienteReceta.findAll({
             where: { id_ingrediente },
-            include: [{ model: Receta, attributes: ['nombreReceta'] }] // Solo el nombre de la receta
+            include: [{ model: Receta, attributes: ['nombreReceta'] }] 
         });
         if (recetasConIngrediente.length === 0) {
             return res.status(404).json({ message: 'No se encontraron recetas para este ingrediente.' });
@@ -92,7 +92,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ message: 'El ID de receta proporcionado no existe.' });
         }
 
-        // Opcional: Evitar duplicados (un mismo ingrediente en la misma receta)
+        // Evitar duplicados 
         const existeAsociacion = await IngredienteReceta.findOne({
             where: { id_ingrediente, id_receta }
         });
@@ -118,7 +118,7 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Asociación Ingrediente-Receta no encontrada.' });
         }
 
-        // Opcional: Validar si el nuevo ingrediente o receta existen
+        //Validar si el nuevo ingrediente o receta existen
         if (id_ingrediente) {
             const ingredienteExistente = await Ingrediente.findByPk(id_ingrediente);
             if (!ingredienteExistente) {

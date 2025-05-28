@@ -1,6 +1,6 @@
 // src/routes/comentario.routes.js
 import { Router } from 'express';
-import { Comentario, Usuario, Receta } from '../models/index.js'; // Asegúrate de importar Usuario y Receta
+import { Comentario, Usuario, Receta } from '../models/index.js'; 
 
 const router = Router();
 
@@ -99,7 +99,7 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Comentario no encontrado.' });
         }
 
-        // Opcional: Validar si el usuario y la receta existen antes de actualizar
+        // Validar si el usuario y la receta existen antes de actualizar
         if (id_usuario) {
             const usuarioExistente = await Usuario.findByPk(id_usuario);
             if (!usuarioExistente) {

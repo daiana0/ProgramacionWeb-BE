@@ -1,6 +1,6 @@
 // src/routes/receta.routes.js
 import { Router } from 'express';
-// Importa todos los modelos relacionados para inclusiones
+// Importa tods los modelos relacionados para inclusiones
 import { 
     Receta, 
     Usuario, 
@@ -11,10 +11,10 @@ import {
     Categoria, 
     RecetaTipoCocina, 
     TipoCocina,
-    Calificacion, // Para obtener calificaciones de una receta
-    Comentario // Para obtener comentarios de una receta
+    Calificacion, 
+    Comentario 
 } from '../models/index.js';
-import { Op } from 'sequelize'; // Para operadores de Sequelize como [Op.ne] en actualizaciones
+import { Op } from 'sequelize'; 
 
 const router = Router();
 
@@ -23,38 +23,38 @@ router.get('/', async (req, res) => {
     try {
         const recetas = await Receta.findAll({
             include: [
-                { model: Usuario, attributes: ['nombreUsuario', 'email'] }, // Usuario que creó la receta
+                { model: Usuario, attributes: ['nombreUsuario', 'email'] }, 
                 { 
                     model: PasoPreparacion, 
                     attributes: ['numero_orden', 'instruccion'], 
-                    order: [['numero_orden', 'ASC']] // Ordenar pasos por número
+                    order: [['numero_orden', 'ASC']] 
                 },
                 { 
                     model: IngredienteReceta, 
                     attributes: ['cantidad', 'unidad_medida'],
-                    include: [{ model: Ingrediente, attributes: ['nombre'] }] // Ingredientes con sus detalles
+                    include: [{ model: Ingrediente, attributes: ['nombre'] }] 
                 },
                 { 
                     model: Categoria, 
-                    as: 'Categorias', // Alias definido en la asociación N:M si lo usas
+                    as: 'Categorias', 
                     attributes: ['nombre'], 
-                    through: { attributes: [] } // No incluir atributos de la tabla intermedia
+                    through: { attributes: [] } 
                 },
                 { 
                     model: TipoCocina, 
-                    as: 'TiposCocina', // Alias definido en la asociación N:M si lo usas
+                    as: 'TiposCocina', 
                     attributes: ['nombre'], 
-                    through: { attributes: [] } // No incluir atributos de la tabla intermedia
+                    through: { attributes: [] } 
                 },
                  { 
                     model: Calificacion, 
                     attributes: ['puntaje', 'fecha'],
-                    include: [{ model: Usuario, attributes: ['nombreUsuario'] }] // Calificaciones de la receta
+                    include: [{ model: Usuario, attributes: ['nombreUsuario'] }] 
                 },
                 { 
                     model: Comentario, 
                     attributes: ['texto', 'fecha'],
-                    include: [{ model: Usuario, attributes: ['nombreUsuario'] }] // Comentarios de la receta
+                    include: [{ model: Usuario, attributes: ['nombreUsuario'] }] 
                 }
             ]
         });
@@ -116,7 +116,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// --- Obtener recetas por ID de usuario (creador) ---
+// --- Obtener recetas por ID de usuario ---
 router.get('/usuario/:id_usuario', async (req, res) => {
     const { id_usuario } = req.params;
     try {
@@ -183,10 +183,10 @@ router.post('/', async (req, res) => {
         tiempo_coccion, 
         dificultad, 
         id_usuario,
-        ingredientes, // Array de { id_ingrediente, cantidad, unidad_medida }
-        pasos,        // Array de { numero_orden, instruccion }
-        categorias,   // Array de { id_categoria } o { nombre }
-        tipos_cocina  // Array de { id_tipoCocina } o { nombre }
+        ingredientes,
+        pasos,        
+        categorias,   
+        tipos_cocina 
     } = req.body;
 
     try {
@@ -196,7 +196,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ message: 'El ID de usuario proporcionado no existe.' });
         }
 
-        // Opcional: Validar si el título de la receta ya existe (podrías querer que sean únicos)
+        //Validar si el título de la receta ya existe
         const recetaExistente = await Receta.findOne({ where: { titulo } });
         if (recetaExistente) {
             return res.status(409).json({ message: 'Ya existe una receta con este título.' });
@@ -212,7 +212,7 @@ router.post('/', async (req, res) => {
             id_usuario 
         });
 
-        // Crear pasos de preparación si se proporcionan
+        // Crear pasos de preparacion si se proporcionan
         if (pasos && pasos.length > 0) {
             const pasosParaCrear = pasos.map(p => ({ ...p, id_receta: nuevaReceta.id }));
             await PasoPreparacion.bulkCreate(pasosParaCrear);
@@ -229,7 +229,7 @@ router.post('/', async (req, res) => {
 
         // Asociar categorías si se proporcionan
         if (categorias && categorias.length > 0) {
-            // Asegúrate de que las IDs de categoría existan o crea nuevas si tu lógica lo permite
+            
             const categoriasExistentes = await Categoria.findAll({
                 where: { id: categorias.map(c => c.id) }
             });
@@ -241,7 +241,7 @@ router.post('/', async (req, res) => {
 
         // Asociar tipos de cocina si se proporcionan
         if (tipos_cocina && tipos_cocina.length > 0) {
-            // Asegúrate de que las IDs de tipo de cocina existan o crea nuevas
+            
             const tiposCocinaExistentes = await TipoCocina.findAll({
                 where: { id: tipos_cocina.map(tc => tc.id) }
             });
@@ -268,10 +268,10 @@ router.put('/:id', async (req, res) => {
         tiempo_coccion, 
         dificultad, 
         id_usuario,
-        ingredientes, // Opcional: para actualizar ingredientes
-        pasos,        // Opcional: para actualizar pasos
-        categorias,   // Opcional: para actualizar categorías
-        tipos_cocina  // Opcional: para actualizar tipos de cocina
+        ingredientes, 
+        pasos,        
+        categorias,  
+        tipos_cocina  
     } = req.body;
 
     try {
@@ -280,7 +280,7 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Receta no encontrada.' });
         }
 
-        // Validar si el nuevo usuario existe (si se cambia)
+        // Validar si el nuevo usuario existe 
         if (id_usuario && id_usuario !== receta.id_usuario) {
             const usuarioExistente = await Usuario.findByPk(id_usuario);
             if (!usuarioExistente) {
@@ -288,7 +288,7 @@ router.put('/:id', async (req, res) => {
             }
         }
 
-        // Validar unicidad del título si cambia
+        // Validar si cambia titulo
         if (titulo && titulo !== receta.titulo) {
             const recetaConMismoTitulo = await Receta.findOne({
                 where: { titulo, id: { [Op.ne]: id } }
@@ -309,8 +309,7 @@ router.put('/:id', async (req, res) => {
 
         // Actualizar pasos de preparación
         if (pasos) {
-            // Eliminar pasos existentes y crear nuevos. 
-            // Podrías implementar una lógica de actualización más granular para evitar eliminaciones masivas.
+        
             await PasoPreparacion.destroy({ where: { id_receta: receta.id } });
             if (pasos.length > 0) {
                 const pasosParaCrear = pasos.map(p => ({ ...p, id_receta: receta.id }));
@@ -368,17 +367,6 @@ router.delete('/:id', async (req, res) => {
         if (!receta) {
             return res.status(404).json({ message: 'Receta no encontrada.' });
         }
-
-        // La eliminación en cascada debería ser manejada por las asociaciones en models/index.js
-        // Si no tienes onDelete: 'CASCADE' configurado, necesitarías eliminar manualmente
-        // los pasos, ingredientesReceta, calificaciones, comentarios, etc., asociados primero.
-        // Ejemplo (si no usas CASCADE):
-        // await PasoPreparacion.destroy({ where: { id_receta: id } });
-        // await IngredienteReceta.destroy({ where: { id_receta: id } });
-        // await Calificacion.destroy({ where: { id_receta: id } });
-        // await Comentario.destroy({ where: { id_receta: id } });
-        // await RecetaCategoria.destroy({ where: { id_receta: id } });
-        // await RecetaTipoCocina.destroy({ where: { id_receta: id } });
 
         await receta.destroy();
         res.status(200).json({ message: 'Receta eliminada exitosamente.' });

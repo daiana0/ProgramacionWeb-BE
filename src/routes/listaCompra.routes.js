@@ -1,6 +1,5 @@
 // src/routes/listaCompra.routes.js
 import { Router } from 'express';
-// Asegúrate de importar Usuario y ItemListaCompra
 import { ListaCompra, Usuario, ItemListaCompra, Ingrediente } from '../models/index.js'; 
 
 const router = Router();
@@ -10,12 +9,8 @@ router.get('/', async (req, res) => {
     try {
         const listasCompra = await ListaCompra.findAll({
             include: [
-                { model: Usuario, attributes: ['nombreUsuario', 'email'] }, // Incluye el usuario al que pertenece la lista
-                // También puedes incluir los ítems de cada lista si lo necesitas:
-                // { 
-                //     model: ItemListaCompra, 
-                //     include: [{ model: Ingrediente, attributes: ['nombre'] }] 
-                // } 
+                { model: Usuario, attributes: ['nombreUsuario', 'email'] }, 
+                
             ]
         });
         res.json(listasCompra);
@@ -32,7 +27,6 @@ router.get('/:id', async (req, res) => {
         const listaCompra = await ListaCompra.findByPk(id, {
             include: [
                 { model: Usuario, attributes: ['nombreUsuario', 'email'] },
-                // Incluir los ítems de esta lista si los necesitas al obtener una sola lista
                 { 
                     model: ItemListaCompra, 
                     include: [{ model: Ingrediente, attributes: ['nombre'] }] 
@@ -53,7 +47,7 @@ router.get('/:id', async (req, res) => {
 router.get('/usuario/:id_usuario', async (req, res) => {
     const { id_usuario } = req.params;
     try {
-        // Valida que el Usuario exista antes de buscar sus listas
+    
         const usuarioExistente = await Usuario.findByPk(id_usuario);
         if (!usuarioExistente) {
             return res.status(404).json({ message: 'El Usuario especificado no existe.' });
@@ -63,7 +57,6 @@ router.get('/usuario/:id_usuario', async (req, res) => {
             where: { id_usuario },
             include: [
                 { model: Usuario, attributes: ['nombreUsuario', 'email'] },
-                // También puedes incluir los ítems de cada lista del usuario
                 { 
                     model: ItemListaCompra, 
                     include: [{ model: Ingrediente, attributes: ['nombre'] }] 
@@ -91,7 +84,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ message: 'El ID de usuario proporcionado no existe.' });
         }
 
-        // Opcional: Evitar nombres de lista duplicados para el mismo usuario
+        //Evitar nombres de lista duplicados para el mismo usuario
         const existeLista = await ListaCompra.findOne({
             where: { nombre, id_usuario }
         });
@@ -117,7 +110,7 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Lista de compra no encontrada.' });
         }
 
-        // Opcional: Validar si el nuevo usuario existe
+        //Validar si el nuevo usuario existe
         if (id_usuario) {
             const usuarioExistente = await Usuario.findByPk(id_usuario);
             if (!usuarioExistente) {
@@ -125,7 +118,7 @@ router.put('/:id', async (req, res) => {
             }
         }
 
-        // Opcional: Validar si el nuevo nombre ya existe para el mismo usuario (si se cambia)
+        //Validar si el nuevo nombre ya existe para el mismo usuario (si se cambia)
         if (nombre && listaCompra.nombre !== nombre) { // Solo si el nombre realmente cambia
             const existeListaConNuevoNombre = await ListaCompra.findOne({
                 where: { nombre, id_usuario: id_usuario || listaCompra.id_usuario }
@@ -151,10 +144,6 @@ router.delete('/:id', async (req, res) => {
         if (!listaCompra) {
             return res.status(404).json({ message: 'Lista de compra no encontrada.' });
         }
-
-        // Importante: Considera la eliminación en cascada de los ítems de esta lista.
-        // Sequelize maneja esto si configuras `onDelete: 'CASCADE'` en tus asociaciones.
-        // Si no, deberías eliminar manualmente los ítems relacionados primero:
         await ItemListaCompra.destroy({ where: { id_listaCompra: id } });
 
         await listaCompra.destroy();

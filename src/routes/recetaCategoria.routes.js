@@ -26,8 +26,8 @@ router.get('/:id', async (req, res) => {
 // Crear una nueva relación
 router.post('/', async (req, res) => {
     try {
-        const { id, id_categoria, id_receta } = req.body;
-        const nuevaRecetaCategoria = await RecetaCategoria.create({ id, id_categoria, id_receta });
+        const { id,id_categoria, id_receta } = req.body;
+        const nuevaRecetaCategoria = await RecetaCategoria.create({ id,id_categoria, id_receta });
         res.status(201).json(nuevaRecetaCategoria);
     } catch (error) {
         res.status(400).json({ error: error.message });

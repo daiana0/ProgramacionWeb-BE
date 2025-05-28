@@ -26,8 +26,8 @@ router.get('/:id', async (req, res) => {
 // Crear un nuevo tipo de cocina
 router.post('/', async (req, res) => {
     try {
-        const {id, nombre } = req.body;
-        const nuevoTipoCocina = await TipoCocina.create({ id, nombre });
+        const { id, nombre } = req.body;
+        const nuevoTipoCocina = await TipoCocina.create({id, nombre });
         res.status(201).json(nuevoTipoCocina);
     } catch (error) {
         res.status(400).json({ error: error.message });

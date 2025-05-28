@@ -71,7 +71,7 @@ router.get('/receta/:id_receta', async (req, res) => {
 router.post('/', async (req, res) => {
     const { id, puntaje, fecha, id_usuario, id_receta } = req.body;
     try {
-        // Opcional: Validar si el usuario y la receta existen antes de crear la calificación
+        // Validar si el usuario y la receta existen antes de crear la calificación
         const usuarioExistente = await Usuario.findByPk(id_usuario);
         if (!usuarioExistente) {
             return res.status(400).json({ message: 'El ID de usuario proporcionado no existe.' });
@@ -100,7 +100,7 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Calificación no encontrada.' });
         }
 
-        // Opcional: Validar si el usuario y la receta existen antes de actualizar
+        //Validar si el usuario y la receta existen antes de actualizar
         if (id_usuario) {
             const usuarioExistente = await Usuario.findByPk(id_usuario);
             if (!usuarioExistente) {

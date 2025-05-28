@@ -1,6 +1,5 @@
 // src/routes/pasoPreparacion.routes.js
 import { Router } from 'express';
-// Asegúrate de importar el modelo Receta
 import { PasoPreparacion, Receta } from '../models/index.js'; 
 
 const router = Router();
@@ -10,7 +9,7 @@ router.get('/', async (req, res) => {
     try {
         const pasosPreparacion = await PasoPreparacion.findAll({
             include: [
-                { model: Receta, attributes: ['nombreReceta', 'descripcion'] } // Incluye la receta a la que pertenece el paso
+                { model: Receta, attributes: ['nombreReceta', 'descripcion'] } 
             ]
         });
         res.json(pasosPreparacion);
@@ -51,7 +50,7 @@ router.get('/receta/:id_receta', async (req, res) => {
 
         const pasos = await PasoPreparacion.findAll({
             where: { id_receta },
-            order: [['numero_orden', 'ASC']] // Ordena los pasos por número de orden
+            order: [['numero_orden', 'ASC']] 
         });
         
         if (pasos.length === 0) {
@@ -74,7 +73,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ message: 'El ID de receta proporcionado no existe.' });
         }
 
-        // Opcional: Validar si ya existe un paso con el mismo numero_orden para la misma receta
+        // Validar si ya existe un paso con el mismo numero_orden para la misma receta
         const pasoExistente = await PasoPreparacion.findOne({
             where: { id_receta, numero_orden }
         });
@@ -100,7 +99,7 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Paso de preparación no encontrado.' });
         }
 
-        // Opcional: Validar si la nueva receta existe
+        // Validar si la nueva receta existe
         if (id_receta) {
             const recetaExistente = await Receta.findByPk(id_receta);
             if (!recetaExistente) {
@@ -108,13 +107,13 @@ router.put('/:id', async (req, res) => {
             }
         }
 
-        // Opcional: Validar unicidad del numero_orden si cambia y no es el mismo paso
+        //Validar unicidad del numero_orden si cambia y no es el mismo paso
         if (numero_orden && (numero_orden !== pasoPreparacion.numero_orden || id_receta !== pasoPreparacion.id_receta)) {
             const pasoConMismoOrden = await PasoPreparacion.findOne({
                 where: {
-                    id_receta: id_receta || pasoPreparacion.id_receta, // Usa el nuevo id_receta o el actual
+                    id_receta: id_receta || pasoPreparacion.id_receta, 
                     numero_orden,
-                    id: { [Op.ne]: id } // Asegura que no sea el mismo paso que estamos actualizando
+                    id: { [Op.ne]: id } 
                 }
             });
             if (pasoConMismoOrden) {

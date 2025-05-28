@@ -1,6 +1,5 @@
 // src/routes/itemListaCompra.routes.js
 import { Router } from 'express';
-// Asegúrate de importar ListaCompra (si existe) e Ingrediente
 import { ItemListaCompra, ListaCompra, Ingrediente } from '../models/index.js'; 
 
 const router = Router();
@@ -10,9 +9,8 @@ router.get('/', async (req, res) => {
     try {
         const itemsListaCompra = await ItemListaCompra.findAll({
             include: [
-                // Incluye la información de la lista de compra (si tienes el modelo ListaCompra)
-                // { model: ListaCompra, attributes: ['nombreLista', 'fechaCreacion'] }, 
-                { model: Ingrediente, attributes: ['nombre'] } // Incluye el nombre del ingrediente
+               
+                { model: Ingrediente, attributes: ['nombre'] } 
             ]
         });
         res.json(itemsListaCompra);
@@ -28,7 +26,7 @@ router.get('/:id', async (req, res) => {
     try {
         const itemListaCompra = await ItemListaCompra.findByPk(id, {
             include: [
-                // { model: ListaCompra, attributes: ['nombreLista', 'fechaCreacion'] },
+               
                 { model: Ingrediente, attributes: ['nombre'] }
             ]
         });
@@ -71,8 +69,7 @@ router.get('/lista/:id_listaCompra', async (req, res) => {
 router.post('/', async (req, res) => {
     const { id, cantidad, unidad_medida, id_listaCompra, id_ingrediente } = req.body;
     try {
-        // Validar si la lista de compra y el ingrediente existen
-        // Descomenta y adapta si tienes el modelo ListaCompra
+    
         const listaExistente = await ListaCompra.findByPk(id_listaCompra);
         if (!listaExistente) {
             return res.status(400).json({ message: 'El ID de lista de compra proporcionado no existe.' });
@@ -83,7 +80,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ message: 'El ID de ingrediente proporcionado no existe.' });
         }
 
-        // Opcional: Evitar duplicados (un mismo ingrediente en la misma lista)
+        //Evitar duplicados (un mismo ingrediente en la misma lista)
         const existeItem = await ItemListaCompra.findOne({
             where: { id_listaCompra, id_ingrediente }
         });
@@ -109,7 +106,7 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Ítem de lista de compra no encontrado.' });
         }
 
-        // Opcional: Validar si la nueva lista de compra o ingrediente existen
+        //Validar si la nueva lista de compra o ingrediente existen
         if (id_listaCompra) {
             const listaExistente = await ListaCompra.findByPk(id_listaCompra);
             if (!listaExistente) {

@@ -3,7 +3,6 @@ import RecetaTipoCocina from '../models/RecetaTipoCocina.js';
 
 const router = express.Router();
 
-// Obtener todas las relaciones receta-tipo de cocina
 router.get('/', async (req, res) => {
     try {
         const recetasTipoCocina = await RecetaTipoCocina.findAll();
@@ -26,8 +25,8 @@ router.get('/:id', async (req, res) => {
 // Crear una nueva relación
 router.post('/', async (req, res) => {
     try {
-        const { id, id_tipoCocina, id_receta } = req.body;
-        const nuevaRecetaTipoCocina = await RecetaTipoCocina.create({id, id_tipoCocina, id_receta });
+        const {id, id_tipoCocina, id_receta } = req.body;
+        const nuevaRecetaTipoCocina = await RecetaTipoCocina.create({ id,id_tipoCocina, id_receta });
         res.status(201).json(nuevaRecetaTipoCocina);
     } catch (error) {
         res.status(400).json({ error: error.message });
